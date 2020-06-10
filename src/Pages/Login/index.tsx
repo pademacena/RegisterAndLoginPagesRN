@@ -36,6 +36,9 @@ const Login = () => {
       .catch((error) => {
         Alert.alert("Email ou senha incorreto.");
       });
+
+    setEmail("");
+    setPassword("");
   }
 
   return (
