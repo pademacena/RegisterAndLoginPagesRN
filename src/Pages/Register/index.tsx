@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,15 +7,48 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import api from "../../services/api";
+
+interface Register {
+  user: {
+    email: string;
+    name: string;
+    password: string;
+  };
+}
 
 const Register = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
   function handleLoginNavigation() {
     navigation.navigate("Login");
+  }
+
+  function handleRegister() {
+    api
+      .post<Register>("user", {
+        email,
+        password,
+        name,
+      })
+      .then((response) => {
+        console.log(response.data);
+        Alert.alert("Register Success");
+        navigation.navigate("Login");
+      })
+      .catch((error) => {
+        Alert.alert("Not Registred");
+      });
+    setEmail("");
+    setName("");
+    setPassword("");
   }
   return (
     <ImageBackground
@@ -36,6 +69,8 @@ const Register = () => {
               style={styles.input}
               placeholder={"Username"}
               placeholderTextColor="#494949"
+              value={name}
+              onChangeText={setName}
             />
           </View>
           <View style={styles.containerInput}>
@@ -49,6 +84,8 @@ const Register = () => {
               style={styles.input}
               placeholder={"Email"}
               placeholderTextColor="#494949"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
           <View style={styles.containerInput}>
@@ -63,6 +100,8 @@ const Register = () => {
               placeholder={"Password"}
               secureTextEntry={true}
               placeholderTextColor="#494949"
+              value={password}
+              onChangeText={setPassword}
             />
           </View>
           <Text style={styles.signUP} onPress={handleLoginNavigation}>
@@ -71,7 +110,7 @@ const Register = () => {
         </View>
 
         <View style={styles.containerButton}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.textButton}>Register</Text>
           </TouchableOpacity>
         </View>

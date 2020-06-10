@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,15 +7,35 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import api from "../../services/api";
+
+interface Login {
+  user: { email: string; password: string; _id: string };
+}
 
 const Login = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   function handleRegisterNavigation() {
     navigation.navigate("Register");
+  }
+
+  function handleLoginText() {
+    api
+      .post<Login>("auth", { email, password })
+      .then((response) => {
+        console.log(response.data);
+        Alert.alert(`${response.data.user._id}`);
+      })
+      .catch((error) => {
+        Alert.alert("Email ou senha incorreto.");
+      });
   }
 
   return (
@@ -37,6 +57,8 @@ const Login = () => {
               style={styles.input}
               placeholder={"E-mail"}
               placeholderTextColor="#494949"
+              onChangeText={setEmail}
+              value={email}
             />
           </View>
           <View style={styles.containerInput}>
@@ -51,6 +73,8 @@ const Login = () => {
               placeholder={"Password"}
               secureTextEntry={true}
               placeholderTextColor="#494949"
+              onChangeText={setPassword}
+              value={password}
             />
           </View>
           <Text style={styles.register} onPress={handleRegisterNavigation}>
@@ -58,7 +82,7 @@ const Login = () => {
           </Text>
         </View>
         <View style={styles.containerButton}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleLoginText}>
             <Text style={styles.textButton}>Login</Text>
           </TouchableOpacity>
         </View>
